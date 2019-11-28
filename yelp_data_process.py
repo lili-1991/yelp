@@ -15,6 +15,7 @@ def main():
     businiess_id = businiess_id.rdd.map(lambda x: x['business_id']).zipWithIndex().toDF(['business_id','bid'])
     # businiess_id.write.save("/Bid", format='csv', mode='overwrite')
     businiess_id.show()
-
+    spark.stop()
+    
 if __name__ == "__main__":
     main()

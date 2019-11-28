@@ -112,7 +112,7 @@ def main():
     bid_convert = spark.sql(""" SELECT DISTINCT business_id FROM yelp_business""")
     bid_convert = bid_convert.rdd.map(lambda x: x['business_id']).zipWithIndex().toDF(['business_id','bid'])
     bid_convert.createOrReplaceTempView('bid_convert')
-    
+
     bid_convert.show()
     bid_total = bid_convert.count()
 
@@ -146,7 +146,7 @@ def main():
 
     toronto_business.createOrReplaceTempView('toronto_business')
     ALS_data_All = spark.sql("""
-            SELECT u.uid as user_id, tb.id as item_id, r.stars as rate  
+            SELECT tb.user_id as user_id, tb.id as item_id, r.stars as rate  
             FROM toronto_business tb JOIN yelp_review r
             ON tb.business_id = r.business_id
             JOIN yelp_user u
@@ -154,7 +154,7 @@ def main():
     ALS_data_All.show()
 
     ALS_data_Rest = spark.sql("""
-            SELECT u.uid as user_id, tb.id as item_id, r.stars as rate  
+            SELECT tb.user_id  as user_id, tb.id as item_id, r.stars as rate  
             FROM toronto_business tb JOIN yelp_review r
             ON tb.business_id = r.business_id
             JOIN yelp_user u

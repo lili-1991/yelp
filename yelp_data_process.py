@@ -120,7 +120,7 @@ def main():
     uid_convert = spark.sql(""" SELECT DISTINCT user_id FROM yelp_user""")
     uid_convert = uid_convert.rdd.map(lambda x: x['user_id']).zipWithIndex().toDF(['user_id','uid'])
     uid_convert.createOrReplaceTempView('uid_convert')
-    uid_convert = spark.sql(""" SELECT user_id, uid + {} as uid FROM user_id""".format(bid_total))
+    uid_convert = spark.sql(""" SELECT user_id, uid + {} as uid FROM uid_convert""".format(bid_total))
     uid_convert.createOrReplaceTempView('uid_convert')
 
     addNewCatetory = udf(add_new_categories, StringType())

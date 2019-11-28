@@ -110,7 +110,7 @@ def main():
 
     yelp_business.createOrReplaceTempView('yelp_business')
     bid_convert = spark.sql(""" SELECT DISTINCT business_id FROM yelp_business""")
-    bid_convert = business_id.rdd.map(lambda x: x['business_id']).zipWithIndex().toDF(['business_id','bid'])
+    bid_convert = bid_convert.rdd.map(lambda x: x['business_id']).zipWithIndex().toDF(['business_id','bid'])
 
     bid_convert.show()
     bid_total = bid_convert.count()

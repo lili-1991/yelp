@@ -115,8 +115,8 @@ def main():
     bid_convert.show()
     bid_total = bid_convert.count()
 
-    yelp_user.createOrReplaceTempView('yelp_users')
-    uid_convert = spark.sql(""" SELECT DISTINCT user_id FROM yelp_users""")
+    yelp_user.createOrReplaceTempView('yelp_user')
+    uid_convert = spark.sql(""" SELECT DISTINCT user_id FROM yelp_user""")
     uid_convert = uid_convert.rdd.map(lambda x: x['user_id']).zipWithIndex().toDF(['user_id','uid'])
     uid_convert.createOrReplaceTempView('user_id')
     uid_convert = spark.sql(""" SELECT user_id, uid + {} as uid FROM user_id""".format(bid_total))
@@ -126,7 +126,7 @@ def main():
     yelp_business.createOrReplaceTempView('yelp_business')
 
     yelp_review.createOrReplaceTempView('yelp_review')
-    
+
     toronto_business = spark.sql("""
             SELECT bc.bid as business_id, b.business_id as business_sid, b.name as business_name,
             b.latitude as business_latitude, b.longitude as business_longitude, b.category as business_category,

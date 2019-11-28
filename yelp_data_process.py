@@ -5,8 +5,8 @@ import sys
 spark = SparkSession.builder.appName('data_process').getOrCreate()
 
 def main():
-	#step 1 convert string business id to int id
-	schema_bid = StructType([
+    #step 1 convert string business id to int id
+    schema_bid = StructType([
         StructField('business_id', StringType(), False)
     ])
 

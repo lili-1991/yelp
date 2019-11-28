@@ -9,7 +9,7 @@ def main():
 	schema_bid = StructType([
         StructField('business_id', StringType(), False)
     ])
-    
+
     yelp_business = spark.read.json("/business.json", schema_bid)
     yelp_business.createOrReplaceTempView('yelp_business')
     businiess_id = spark.sql(""" SELECT DISTINCT business_id FROM yelp_business""")

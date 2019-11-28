@@ -125,6 +125,8 @@ def main():
     yelp_business = yelp_business.withColumn('category', addNewCatetory('categories')) 
     yelp_business.createOrReplaceTempView('yelp_business')
 
+    yelp_review.createOrReplaceTempView('yelp_review')
+    
     toronto_business = spark.sql("""
             SELECT bc.bid as business_id, b.business_id as business_sid, b.name as business_name,
             b.latitude as business_latitude, b.longitude as business_longitude, b.category as business_category,

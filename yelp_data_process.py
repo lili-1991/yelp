@@ -155,7 +155,7 @@ def main():
             WHERE tb.business_category='Restaurants' """)
 
     # ALS_data_Rest.show()
-    ALS_data_Rest.write.save("/ALS_data_All/all.json", format='json', mode='overwrite')
+    ALS_data_Rest.write.save("/ALS_data_Rest/restaurants.json", format='json', mode='overwrite')
    
 
     spark.stop()

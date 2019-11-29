@@ -4,8 +4,6 @@ import sys
 import os
 from pyspark.sql import Row
 from pyspark.sql.functions import udf
-from pyspark.ml.recommendation import ALS
-from pyspark.ml.evaluation import RegressionEvaluator
 
 spark = SparkSession.builder.appName('data_process').getOrCreate()
 
@@ -89,7 +87,7 @@ def read_file():
         StructField('review_id', StringType(), False),
         StructField('user_id', StringType(), False),
         StructField('business_id', StringType(), False),
-        StructField('stars', IntegerType(), False),
+        StructField('stars', FloatType(), False),
         StructField('date', DateType(), False),
         StructField('text', StringType(), False),
         StructField('useful', IntegerType(), False),
@@ -113,7 +111,7 @@ def main():
     bid_convert = bid_convert.rdd.map(lambda x: x['business_id']).zipWithIndex().toDF(['business_id','bid'])
     bid_convert.createOrReplaceTempView('bid_convert')
 
-    bid_convert.show()
+    # bid_convert.show()
     bid_total = bid_convert.count()
 
     yelp_user.createOrReplaceTempView('yelp_user')
@@ -146,31 +144,19 @@ def main():
 
     toronto_business.createOrReplaceTempView('toronto_business')
     ALS_data_All = spark.sql("""
-            SELECT tb.user_id as user_id, tb.business_id as item_id, r.stars as rate  
-            FROM toronto_business tb JOIN yelp_review r
-            ON tb.business_id = r.business_id
-            JOIN yelp_user u
-            ON r.user_id = u.user_id """)
-    ALS_data_All.show()
+            SELECT tb.user_id as user_id, tb.business_id as item_id, tb.user_rate_stars as rate  
+            FROM toronto_business tb  """)
+    # ALS_data_All.show()
+    ALS_data_All.write.save("/ALS_data_All/all.json", format='json', mode='overwrite')
 
     ALS_data_Rest = spark.sql("""
-            SELECT tb.user_id  as user_id, tb.business_id as item_id, r.stars as rate  
-            FROM toronto_business tb JOIN yelp_review r
-            ON tb.business_id = r.business_id
-            JOIN yelp_user u
-            ON r.user_id = u.user_id
+            SELECT tb.user_id as user_id, tb.business_id as item_id, tb.user_rate_stars as rate  
+            FROM toronto_business tb  
             WHERE tb.business_category='Restaurants' """)
-    ALS_data_Rest.show()
 
-    als = ALS(rank=20, regParam=0.4, maxIter=30, userCol='user_id',
-    itemCol='item_id', ratingCol='rate', coldStartStrategy="drop")   
-    model = als.fit(ALS_data_All)
-    model.save("/model_ALS_all")
-
-    als = ALS(rank=20, regParam=0.4, maxIter=30, userCol='user_id',
-    itemCol='item_id', ratingCol='rate', coldStartStrategy="drop")   
-    model = als.fit(ALS_data_Rest)
-    model.save("/model_ALS_Rest")
+    # ALS_data_Rest.show()
+    ALS_data_Rest.write.save("/ALS_data_All/all.json", format='json', mode='overwrite')
+   
 
     spark.stop()
 

@@ -147,7 +147,7 @@ def main():
             SELECT tb.user_id as user_id, tb.business_id as item_id, tb.user_rate_stars as rate  
             FROM toronto_business tb  """)
     # ALS_data_All.show()
-    ALS_data_All.write.save("/ALS/all.json", format='json', mode='overwrite')
+    ALS_data_All.write.save("/ALS_all", format='json', mode='overwrite')
 
     ALS_data_Rest = spark.sql("""
             SELECT tb.user_id as user_id, tb.business_id as item_id, tb.user_rate_stars as rate  
@@ -155,7 +155,7 @@ def main():
             WHERE tb.business_category='Restaurants' """)
 
     # ALS_data_Rest.show()
-    ALS_data_Rest.write.save("/ALS/restaurants.json", format='json', mode='overwrite')
+    ALS_data_Rest.write.save("/ALS_rest", format='json', mode='overwrite')
    
 
     spark.stop()

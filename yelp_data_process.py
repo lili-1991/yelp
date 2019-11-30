@@ -3,7 +3,7 @@ from pyspark.sql.types import *
 import sys
 import os
 from pyspark.sql import Row
-from pyspark.sql.functions import udf
+from pyspark.sql.functions import udf,explode, lit, desc, count
 
 spark = SparkSession.builder.appName('data_process').getOrCreate()
 
@@ -141,8 +141,28 @@ def main():
             JOIN uid_convert uc
             ON uc.user_id = u.user_id
             WHERE lower(b.city) like '%toronto%' """)
-
     toronto_business.createOrReplaceTempView('toronto_business')
+    
+    user_review_count = spark.sql("""
+            SELECT u.user_id as user_sid, u.review_count as review_count  
+            FROM yelp_user u  """)
+
+    user_review_count = toronto_business.join(user_review_count, 'user_sid')
+
+    user_review_count_node = user_review_count.select('user_sid', 'review_count').distinct() \
+                                .sort(desc('review_count')) \
+                                .limit(100) \
+                                .select('user_sid')
+
+    toronto_user_node = toronto_business.join(user_review_count_node, 'user_sid', 'inner') \
+                                .select('user_sid','business_sid').distinct() \
+                                .groupby('user_sid').agg(count('business_sid')) \
+                                .sort(desc('count(business_sid)'))
+
+    toronto_user_node.createOrReplaceTempView('toronto_user_node')
+    toronto_user_node.write.save('/toronto_TOP_user_node', format='json', mode='overwrite')
+
+    
     ALS_data_All = spark.sql("""
             SELECT tb.user_id as user_id, tb.business_id as item_id, tb.user_rate_stars as rate  
             FROM toronto_business tb  """)
